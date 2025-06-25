@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WatchCat - Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="server/server.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="logo.png" alt="WatchCat Logo" class="sidebar-logo" />
+        <h1>WatchCat</h1>
+        <div class="user-info" id="userInfo">Loading...</div>
+      </div>
+
+      <nav>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="#" class="nav-link active" data-section="dashboard">
+              📊 Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-section="servers">
+              🖥️ Server Management
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-section="services">
+              ⚙️ Service Management
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-section="alerts">
+              🚨 Alert Management
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="header">
+        <h2 id="pageTitle">Dashboard</h2>
+        <div class="header-actions">
+          <span class="user-name" id="headerUserName">Loading...</span>
+          <button class="btn btn-primary" id="changePasswordBtn">
+            🔒 Change Password
+          </button>
+          <button class="btn btn-danger" id="headerLogoutBtn">🚪 Logout</button>
+        </div>
+      </header>
+
+      <!-- Dashboard Section -->
+      <section class="content-section active" id="dashboard">
+        <div class="dashboard-cards">
+          <div class="card">
+            <h3>Total Servers</h3>
+            <div class="value" id="totalServers">0</div>
+            <div class="label">Monitored Servers</div>
+          </div>
+          <div class="card">
+            <h3>Online Servers</h3>
+            <div class="value" id="onlineServers">0</div>
+            <div class="label">Currently Active</div>
+          </div>
+          <div class="card">
+            <h3>Total Services</h3>
+            <div class="value" id="totalServices">0</div>
+            <div class="label">Monitored Services</div>
+          </div>
+          <div class="card">
+            <h3>Active Alerts</h3>
+            <div class="value" id="activeAlerts">0</div>
+            <div class="label">Requires Attention</div>
+          </div>
+        </div>
+
+        <h3>Recent Activity</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Server</th>
+              <th>Event</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recentActivity">
+            <tr>
+              <td colspan="4" style="text-align: center; color: #666">
+                No recent activity
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Server Management Section -->
+      <section class="content-section" id="servers">
+        <div class="server-header">
+          <h3>Server Management</h3>
+          <button class="btn btn-primary" id="addServerBtn">
+            + Add Server
+          </button>
+        </div>
+
+        <div class="server-list" id="serverContainer">
+          <div class="loading-message">Loading servers...</div>
+        </div>
+      </section>
+
+      <!-- Service Management Section -->
+      <section class="content-section" id="services">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+          "
+        >
+          <h3>Service List</h3>
+          <button class="btn btn-primary" id="addServiceBtn">
+            + Add Service
+          </button>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Service Name</th>
+              <th>Server</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="serviceList">
+            <tr>
+              <td colspan="5" style="text-align: center; color: #666">
+                No services configured
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Alert Management Section -->
+      <section class="content-section" id="alerts">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+          "
+        >
+          <h3>Alert Rules</h3>
+          <button class="btn btn-primary" id="addAlertBtn">
+            + Add Alert Rule
+          </button>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Rule Name</th>
+              <th>Condition</th>
+              <th>Threshold</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="alertList">
+            <tr>
+              <td colspan="5" style="text-align: center; color: #666">
+                No alert rules configured
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <div class="connection-status disconnected" id="connectionStatus">
+      Disconnected
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="index.js"></script>
+    <script src="server/server.js"></script>
+  </body>
+</html>
