@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const path = require('path');
 const userModule = require('./user');
 const serverModule = require('./server');
+const watchModule = require('./watch/watch');
 
 const app = express();
 const server = http.createServer(app);
@@ -23,6 +24,9 @@ userModule.setupUserRoutes(app);
 
 // Setup server routes
 serverModule.setupServerRoutes(app, userModule.authenticateToken);
+
+// Setup watch routes
+watchModule.setupWatchRoutes(app);
 
 // Basic routes
 app.get('/', (req, res) => {

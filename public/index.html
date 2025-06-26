@@ -8,6 +8,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <link rel="stylesheet" href="index.css" />
     <link rel="stylesheet" href="server/server.css" />
+    <link rel="stylesheet" href="watch/watch.css" />
   </head>
   <body>
     <aside class="sidebar">
@@ -26,17 +27,22 @@
           </li>
           <li class="nav-item">
             <a href="#" class="nav-link" data-section="servers">
-              🖥️ Server Management
+              🖥️ Server
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link" data-section="services">
-              ⚙️ Service Management
+            <a href="#" class="nav-link" data-section="applications">
+              ⚙️ Application
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-section="watch-templates">
+              📋 Watch
             </a>
           </li>
           <li class="nav-item">
             <a href="#" class="nav-link" data-section="alerts">
-              🚨 Alert Management
+              🚨 Alert
             </a>
           </li>
         </ul>
@@ -69,9 +75,9 @@
             <div class="label">Currently Active</div>
           </div>
           <div class="card">
-            <h3>Total Services</h3>
-            <div class="value" id="totalServices">0</div>
-            <div class="label">Monitored Services</div>
+            <h3>Total Applications</h3>
+            <div class="value" id="totalApplications">0</div>
+            <div class="label">Monitored Applications</div>
           </div>
           <div class="card">
             <h3>Active Alerts</h3>
@@ -114,8 +120,8 @@
         </div>
       </section>
 
-      <!-- Service Management Section -->
-      <section class="content-section" id="services">
+      <!-- Application Management Section -->
+      <section class="content-section" id="applications">
         <div
           style="
             display: flex;
@@ -124,30 +130,41 @@
             margin-bottom: 1rem;
           "
         >
-          <h3>Service List</h3>
-          <button class="btn btn-primary" id="addServiceBtn">
-            + Add Service
+          <h3>Application List</h3>
+          <button class="btn btn-primary" id="addApplicationBtn">
+            + Add Application
           </button>
         </div>
 
         <table class="table">
           <thead>
             <tr>
-              <th>Service Name</th>
+              <th>Application Name</th>
               <th>Server</th>
               <th>Type</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="serviceList">
+          <tbody id="applicationList">
             <tr>
               <td colspan="5" style="text-align: center; color: #666">
-                No services configured
+                No applications configured
               </td>
             </tr>
           </tbody>
         </table>
+      </section>
+
+      <!-- Watch Templates Section -->
+      <section class="content-section" id="watch-templates">
+        <!-- Template List -->
+        <div class="templates-container" id="templatesContainer">
+          <div class="loading-message">
+            <div class="loading-spinner"></div>
+            <p>Loading watch templates...</p>
+          </div>
+        </div>
       </section>
 
       <!-- Alert Management Section -->
@@ -194,5 +211,6 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="index.js"></script>
     <script src="server/server.js"></script>
+    <script src="watch/watch.js"></script>
   </body>
 </html>

@@ -1,0 +1,212 @@
+{
+  "templates": [
+    {
+      "id": "ping",
+      "type": "local",
+      "name": "Ping Monitor",
+      "description": "Check host network connectivity",
+      "variables": [
+        {
+          "name": "ip",
+          "type": "string",
+          "required": true,
+          "description": "Target IP address or domain name"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "isReachable",
+          "type": "bool",
+          "description": "Whether ping is successful"
+        }
+      ]
+    },
+    {
+      "id": "telnet",
+      "type": "local",
+      "name": "Telnet Port Monitor",
+      "description": "Check if specified port is connectable",
+      "variables": [
+        {
+          "name": "ip",
+          "type": "string",
+          "required": true,
+          "description": "Target IP address or domain name"
+        },
+        {
+          "name": "port",
+          "type": "number",
+          "required": true,
+          "description": "Target port number"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "isConnectable",
+          "type": "bool",
+          "description": "Whether port is connectable"
+        }
+      ]
+    },
+    {
+      "id": "httpget",
+      "type": "local",
+      "name": "HTTP GET Monitor",
+      "description": "Check if HTTP service is working properly",
+      "variables": [
+        {
+          "name": "url",
+          "type": "string",
+          "required": true,
+          "description": "Target URL address"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "isSuccess",
+          "type": "bool",
+          "description": "Whether returns 200 status code"
+        }
+      ]
+    },
+    {
+      "id": "server_status",
+      "type": "remote",
+      "name": "Server Status Monitor",
+      "description": "Get overall server running status",
+      "variables": [
+        {
+          "name": "ip",
+          "type": "string",
+          "required": true,
+          "description": "Server IP address"
+        },
+        {
+          "name": "ssh_port",
+          "type": "number",
+          "required": true,
+          "description": "SSH port number"
+        },
+        {
+          "name": "username",
+          "type": "string",
+          "required": true,
+          "description": "SSH username"
+        },
+        {
+          "name": "password",
+          "type": "string",
+          "required": true,
+          "description": "SSH password"
+        },
+        {
+          "name": "server_type",
+          "type": "string",
+          "required": true,
+          "description": "Server type",
+          "defaultValue": "centos"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "diskFreeSize",
+          "type": "number",
+          "description": "Disk free size (GB)"
+        },
+        {
+          "name": "diskFreeRatio",
+          "type": "number",
+          "description": "Disk free size / total size ratio"
+        },
+        {
+          "name": "memoryFreeSize",
+          "type": "number",
+          "description": "Memory free size (GB)"
+        },
+        {
+          "name": "memoryFreeRatio",
+          "type": "number",
+          "description": "Memory free size / total size ratio"
+        },
+        {
+          "name": "cpuUsage",
+          "type": "number",
+          "description": "CPU usage percentage"
+        }
+      ]
+    },
+    {
+      "id": "application_status",
+      "type": "remote",
+      "name": "Application Process Monitor",
+      "description": "Monitor specified application process status",
+      "variables": [
+        {
+          "name": "ip",
+          "type": "string",
+          "required": true,
+          "description": "Server IP address"
+        },
+        {
+          "name": "ssh_port",
+          "type": "number",
+          "required": true,
+          "description": "SSH port number"
+        },
+        {
+          "name": "username",
+          "type": "string",
+          "required": true,
+          "description": "SSH username"
+        },
+        {
+          "name": "password",
+          "type": "string",
+          "required": true,
+          "description": "SSH password"
+        },
+        {
+          "name": "server_type",
+          "type": "string",
+          "required": true,
+          "description": "Server type",
+          "defaultValue": "centos"
+        },
+        {
+          "name": "process_identifier",
+          "type": "string",
+          "required": true,
+          "description": "Process identifier (used to find process, e.g., jar file name, process name)"
+        },
+        {
+          "name": "app_directories",
+          "type": "array",
+          "required": false,
+          "description": "Application directories and files list for disk usage monitoring"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "isAlive",
+          "type": "bool",
+          "description": "Whether process is alive"
+        },
+        {
+          "name": "diskUsage",
+          "type": "number",
+          "description": "Process disk usage (MB)"
+        },
+        {
+          "name": "memoryUsage",
+          "type": "number",
+          "description": "Process memory usage (MB)"
+        },
+        {
+          "name": "cpuUsage",
+          "type": "number",
+          "description": "Process CPU usage percentage"
+        }
+      ]
+    }
+  ]
+}

@@ -94,8 +94,8 @@ function handleNodeMessage(data) {
         case 'serverUpdate':
             updateServerList(data.data);
             break;
-        case 'serviceUpdate':
-            updateServiceList(data.data);
+        case 'applicationUpdate':
+            updateApplicationList(data.data);
             break;
         case 'alertUpdate':
             updateAlertList(data.data);
@@ -134,7 +134,8 @@ function initializeNavigation() {
                 const sectionTitles = {
                     dashboard: 'Dashboard',
                     servers: 'Server Management',
-                    services: 'Service Management',
+                    applications: 'Application Management',
+                    watch: 'Watch Management',
                     alerts: 'Alert Management'
                 };
                 pageTitle.textContent = sectionTitles[targetSection] || 'Dashboard';
@@ -181,10 +182,10 @@ function loadSectionData(section) {
         case 'servers':
             loadServers();
             break;
-        case 'services':
+        case 'applications':
             sendToNode({
-                type: 'getServices',
-                message: 'Request service list'
+                type: 'getApplications',
+                message: 'Request application list'
             });
             break;
         case 'alerts':
@@ -236,31 +237,31 @@ function updateServerList(servers) {
     `).join('');
 }
 
-// Update service list
-function updateServiceList(services) {
-    const serviceListBody = document.getElementById('serviceList');
+// Update application list
+function updateApplicationList(applications) {
+    const applicationListBody = document.getElementById('applicationList');
 
-    if (!services || services.length === 0) {
-        serviceListBody.innerHTML = `
+    if (!applications || applications.length === 0) {
+        applicationListBody.innerHTML = `
             <tr>
-                <td colspan="5" style="text-align: center; color: #666;">No services configured</td>
+                <td colspan="5" style="text-align: center; color: #666;">No applications configured</td>
             </tr>
         `;
         return;
     }
 
-    serviceListBody.innerHTML = services.map(service => `
+    applicationListBody.innerHTML = applications.map(application => `
         <tr>
-            <td>${service.name}</td>
-            <td>${service.server}</td>
-            <td>${service.type}</td>
+            <td>${application.name}</td>
+            <td>${application.server}</td>
+            <td>${application.type}</td>
             <td>
-                <span class="status-indicator ${service.status === 'running' ? 'status-online' : 'status-offline'}"></span>
-                ${service.status}
+                <span class="status-indicator ${application.status === 'running' ? 'status-online' : 'status-offline'}"></span>
+                ${application.status}
             </td>
             <td>
-                <button class="btn btn-primary" onclick="checkService('${service.id}')">Check</button>
-                <button class="btn btn-danger" onclick="removeService('${service.id}')">Remove</button>
+                <button class="btn btn-primary" onclick="checkApplication('${application.id}')">Check</button>
+                <button class="btn btn-danger" onclick="removeApplication('${application.id}')">Remove</button>
             </td>
         </tr>
     `).join('');
@@ -313,19 +314,19 @@ function removeServer(serverId) {
     }
 }
 
-// Service management functions
-function checkService(serviceId) {
+// Application management functions
+function checkApplication(applicationId) {
     sendToNode({
-        type: 'checkService',
-        serviceId: serviceId
+        type: 'checkApplication',
+        applicationId: applicationId
     });
 }
 
-function removeService(serviceId) {
-    if (confirm('Are you sure you want to remove this service?')) {
+function removeApplication(applicationId) {
+    if (confirm('Are you sure you want to remove this application?')) {
         sendToNode({
-            type: 'removeService',
-            serviceId: serviceId
+            type: 'removeApplication',
+            applicationId: applicationId
         });
     }
 }
