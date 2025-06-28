@@ -13,9 +13,60 @@
       href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/themes/light.css"
     />
 
+    <style>
+      /* 自定义Toast通知位置 - 居中显示 */
+      sl-alert.custom-toast-center,
+      sl-alert.sl-alert--toast,
+      sl-alert[data-toast] {
+        position: fixed !important;
+        top: 1rem !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        max-width: 500px !important;
+        min-width: 300px !important;
+        z-index: 10000 !important;
+      }
+
+      /* Toast堆栈容器居中 */
+      .sl-toast-stack {
+        position: fixed !important;
+        top: 1rem !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        width: auto !important;
+        max-width: 500px !important;
+        min-width: 300px !important;
+        z-index: 10000 !important;
+      }
+
+      /* 多个Toast时的间距 */
+      sl-alert.custom-toast-center + sl-alert.custom-toast-center {
+        margin-top: 0.5rem !important;
+      }
+
+      /* 表单样式统一 */
+      .help-text {
+        display: block;
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 0.25rem;
+      }
+
+      /* 确保侧边栏中的Shoelace按钮样式正确 */
+      .notifier-sidebar-close {
+        position: absolute !important;
+        right: 1rem !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+      }
+    </style>
+
     <link rel="stylesheet" href="index.css" />
     <link rel="stylesheet" href="server/server.css" />
     <link rel="stylesheet" href="watch/watch.css" />
+    <link rel="stylesheet" href="notifier/notifier.css" />
   </head>
   <body>
     <aside class="sidebar">
@@ -42,6 +93,11 @@
           <li class="nav-item">
             <a href="#" class="nav-link" data-section="watch-templates">
               📋 Watch
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-section="notifiers">
+              📧 Notifiers
             </a>
           </li>
           <li class="nav-item">
@@ -131,7 +187,7 @@
             </button>
           </div>
           <div class="server-sidebar-content">
-            <form id="serverForm">
+            <form id="serverForm" autocomplete="off">
               <div class="form-group">
                 <label for="serverName">Server Name *</label>
                 <sl-input
@@ -139,6 +195,7 @@
                   name="name"
                   required
                   placeholder="Enter server name"
+                  autocomplete="off"
                 ></sl-input>
               </div>
 
@@ -149,6 +206,7 @@
                   name="ip"
                   required
                   placeholder="192.168.1.100"
+                  autocomplete="off"
                 ></sl-input>
               </div>
 
@@ -159,6 +217,7 @@
                   name="desc"
                   rows="3"
                   placeholder="Optional description"
+                  autocomplete="off"
                 ></sl-textarea>
               </div>
 
@@ -169,6 +228,8 @@
                   name="username"
                   placeholder="root"
                   value="root"
+                  autocomplete="off"
+                  data-lpignore="true"
                 ></sl-input>
               </div>
 
@@ -180,6 +241,8 @@
                   name="password"
                   placeholder="Enter password"
                   password-toggle
+                  autocomplete="new-password"
+                  data-lpignore="true"
                 ></sl-input>
               </div>
 
@@ -247,6 +310,156 @@
         </div>
       </section>
 
+      <!-- Notifier Management Section -->
+      <section class="content-section" id="notifiers">
+        <div class="notifiers-header">
+          <h3>Notification Channels</h3>
+          <sl-button variant="primary" id="addNotifierBtn">
+            <sl-icon slot="prefix" name="plus"></sl-icon>
+            Add Notifier
+          </sl-button>
+        </div>
+
+        <div class="notifiers-list" id="notifiersContainer">
+          <div class="loading-message">Loading notifiers...</div>
+        </div>
+
+        <!-- Notifier Form Sidebar -->
+        <div class="notifier-sidebar-overlay" id="notifierSidebarOverlay"></div>
+        <div class="notifier-sidebar" id="notifierSidebar">
+          <div class="notifier-sidebar-header">
+            <h3 id="notifierSidebarTitle">Add Notifier</h3>
+            <sl-button
+              variant="text"
+              size="small"
+              class="notifier-sidebar-close"
+              id="notifierSidebarClose"
+            >
+              <sl-icon name="x"></sl-icon>
+            </sl-button>
+          </div>
+          <div class="notifier-sidebar-content">
+            <form id="notifierForm" autocomplete="off">
+              <div class="form-group">
+                <label for="notifierName">Notifier Name *</label>
+                <sl-input
+                  id="notifierName"
+                  name="name"
+                  required
+                  placeholder="Enter notifier name"
+                  autocomplete="off"
+                ></sl-input>
+              </div>
+
+              <div class="form-group">
+                <label for="notifierDesc">Description</label>
+                <sl-textarea
+                  id="notifierDesc"
+                  name="desc"
+                  rows="3"
+                  placeholder="Optional description"
+                  autocomplete="off"
+                ></sl-textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="notifierType">Notification Type *</label>
+                <sl-select
+                  id="notifierType"
+                  name="type"
+                  value="email"
+                  required
+                  autocomplete="off"
+                >
+                  <sl-option value="email">Email</sl-option>
+                </sl-select>
+              </div>
+
+              <div class="form-group">
+                <label for="notifierEmails">Email List *</label>
+                <sl-textarea
+                  id="notifierEmails"
+                  name="emails"
+                  rows="2"
+                  placeholder="email1@example.com, email2@example.com"
+                  autocomplete="off"
+                ></sl-textarea>
+                <small class="help-text"
+                  >Enter email addresses separated by commas</small
+                >
+              </div>
+
+              <div class="form-group-divider">
+                <sl-divider></sl-divider>
+                <h4>SMTP Server Configuration</h4>
+              </div>
+
+              <div class="form-group">
+                <label for="smtpHost">SMTP Host *</label>
+                <sl-input
+                  id="smtpHost"
+                  name="smtpHost"
+                  placeholder="smtp.gmail.com"
+                  required
+                  autocomplete="off"
+                ></sl-input>
+              </div>
+
+              <div class="form-group">
+                <label for="smtpPort">SMTP Port *</label>
+                <sl-input
+                  id="smtpPort"
+                  name="smtpPort"
+                  type="number"
+                  value="587"
+                  required
+                  autocomplete="off"
+                ></sl-input>
+              </div>
+
+              <div class="form-group">
+                <label for="smtpUser">SMTP Username *</label>
+                <sl-input
+                  id="smtpUser"
+                  name="smtpUser"
+                  placeholder="your-email@gmail.com"
+                  required
+                  autocomplete="off"
+                  data-lpignore="true"
+                ></sl-input>
+              </div>
+
+              <div class="form-group">
+                <label for="smtpPassword">SMTP Password *</label>
+                <sl-input
+                  id="smtpPassword"
+                  name="smtpPassword"
+                  type="password"
+                  placeholder="Enter SMTP password"
+                  password-toggle
+                  required
+                  autocomplete="new-password"
+                  data-lpignore="true"
+                ></sl-input>
+              </div>
+
+              <div class="form-actions">
+                <sl-button variant="default" id="notifierFormCancel">
+                  Cancel
+                </sl-button>
+                <sl-button
+                  variant="primary"
+                  type="submit"
+                  id="notifierFormSubmit"
+                >
+                  <span id="notifierFormSubmitText">Add Notifier</span>
+                </sl-button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
       <!-- Alert Management Section -->
       <section class="content-section" id="alerts">
         <div
@@ -284,10 +497,6 @@
       </section>
     </main>
 
-    <div class="connection-status disconnected" id="connectionStatus">
-      Disconnected
-    </div>
-
     <!-- Global Confirm Dialog -->
     <sl-dialog label="Confirm Action" id="globalConfirmDialog">
       <p id="confirmMessage">Are you sure?</p>
@@ -301,14 +510,12 @@
 
     <script>
       // Simple Shoelace-based toast system
-      window.showToast = async function (
+      window.showToast = function (
         message,
         type = "info",
         title = null,
         duration = 5000
       ) {
-        // Ensure sl-alert is registered before creating
-        await customElements.whenDefined('sl-alert');
         // Map error to danger for Shoelace variant
         const variant =
           type === "error" ? "danger" : type === "info" ? "primary" : type;
@@ -321,22 +528,25 @@
           primary: "info-circle",
         };
 
-        // Create alert element (like in official examples)
+        // Create alert element
         const alert = document.createElement("sl-alert");
         alert.variant = variant;
         alert.closable = true;
         alert.duration = duration;
+
+        // 添加自定义类来确保居中样式生效
+        alert.classList.add("custom-toast-center");
 
         alert.innerHTML = `
           <sl-icon slot="icon" name="${icons[variant]}"></sl-icon>
           ${title ? `<strong>${title}</strong><br>` : ""}${message}
         `;
 
-        // Add to DOM first
+        // Add to DOM
         document.body.appendChild(alert);
-        setTimeout(() => {
-          alert.toast();
-        }, 200);
+
+        // Show toast immediately
+        alert.toast();
 
         return alert;
       };
@@ -430,14 +640,14 @@
       };
     </script>
 
-    <!-- Shoelace JS -->
+    <!-- Shoelace JS - 完整加载 -->
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/shoelace-autoloader.js"
+      src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/shoelace.js"
     ></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="index.js"></script>
     <script src="server/server.js"></script>
     <script src="watch/watch.js"></script>
+    <script src="notifier/notifier.js"></script>
+    <script src="index.js"></script>
   </body>
 </html>

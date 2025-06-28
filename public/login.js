@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const loading = document.getElementById('loading');
 
     // Check if user is already logged in
-    const token = localStorage.getItem('watchcat_token');
+    const token = localStorage.getItem('token');
     if (token) {
         verifyToken(token);
     }
@@ -40,8 +40,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (data.success) {
                 // Store token in localStorage
-                localStorage.setItem('watchcat_token', data.token);
-                localStorage.setItem('watchcat_user', JSON.stringify(data.user));
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
 
                 // Redirect to main page
                 window.location.href = '/index.html';
@@ -70,14 +70,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.href = '/index.html';
             } else {
                 // Token is invalid, remove it
-                localStorage.removeItem('watchcat_token');
-                localStorage.removeItem('watchcat_user');
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
             }
         } catch (error) {
             console.error('Token verification error:', error);
             // Remove invalid token
-            localStorage.removeItem('watchcat_token');
-            localStorage.removeItem('watchcat_user');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
         }
     }
 

@@ -18,7 +18,7 @@ async function loadServers() {
     container.innerHTML = '<div class="loading-message">Loading servers...</div>';
 
     try {
-        const token = localStorage.getItem('watchcat_token');
+        const token = localStorage.getItem('token');
         const response = await fetch('/api/servers', {
             method: 'GET',
             headers: {
@@ -398,7 +398,7 @@ async function handleServerFormSubmit(event) {
 // Create new server
 async function createServer(serverData) {
     try {
-        const token = localStorage.getItem('watchcat_token');
+        const token = localStorage.getItem('token');
         const response = await fetch('/api/servers', {
             method: 'POST',
             headers: {
@@ -434,7 +434,7 @@ function editServer(serverId) {
 // Update server
 async function updateServer(serverId, serverData) {
     try {
-        const token = localStorage.getItem('watchcat_token');
+        const token = localStorage.getItem('token');
         const response = await fetch(`/api/servers/${serverId}`, {
             method: 'PUT',
             headers: {
@@ -470,7 +470,7 @@ async function deleteServer(serverId) {
     }
 
     try {
-        const token = localStorage.getItem('watchcat_token');
+        const token = localStorage.getItem('token');
         const response = await fetch(`/api/servers/${serverId}`, {
             method: 'DELETE',
             headers: {
@@ -517,7 +517,7 @@ async function addWatchTask(serverId) {
 // Create watch task
 async function createWatchTask(serverId, watchData) {
     try {
-        const token = localStorage.getItem('watchcat_token');
+        const token = localStorage.getItem('token');
         const response = await fetch(`/api/servers/${serverId}/watch`, {
             method: 'POST',
             headers: {
@@ -574,7 +574,7 @@ async function editWatchTask(serverId, watchId) {
 // Update watch task
 async function updateWatchTask(serverId, watchId, watchData) {
     try {
-        const token = localStorage.getItem('watchcat_token');
+        const token = localStorage.getItem('token');
         const response = await fetch(`/api/servers/${serverId}/watch/${watchId}`, {
             method: 'PUT',
             headers: {
@@ -606,7 +606,7 @@ async function deleteWatchTask(serverId, watchId) {
     }
 
     try {
-        const token = localStorage.getItem('watchcat_token');
+        const token = localStorage.getItem('token');
         const response = await fetch(`/api/servers/${serverId}/watch/${watchId}`, {
             method: 'DELETE',
             headers: {
@@ -656,7 +656,7 @@ function addAlarm(serverId, watchId) {
 // Create alarm
 async function createAlarm(serverId, watchId, alarmData) {
     try {
-        const token = localStorage.getItem('watchcat_token');
+        const token = localStorage.getItem('token');
         const response = await fetch(`/api/servers/${serverId}/watch/${watchId}/alarm`, {
             method: 'POST',
             headers: {
@@ -688,7 +688,7 @@ async function deleteAlarm(serverId, watchId, alarmId) {
     }
 
     try {
-        const token = localStorage.getItem('watchcat_token');
+        const token = localStorage.getItem('token');
         const response = await fetch(`/api/servers/${serverId}/watch/${watchId}/alarm/${alarmId}`, {
             method: 'DELETE',
             headers: {

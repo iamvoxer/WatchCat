@@ -257,27 +257,6 @@ body {
   font-size: 0.8rem;
 }
 
-/* Connection Status */
-.connection-status {
-  position: fixed;
-  bottom: 1rem;
-  left: 1rem;
-  padding: 0.3rem 0.6rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  z-index: 1000;
-}
-
-.connection-status.connected {
-  background-color: var(--success-color);
-  color: white;
-}
-
-.connection-status.disconnected {
-  background-color: var(--danger-color);
-  color: white;
-}
-
 /* Utility Styles */
 .loading-message {
   text-align: center;

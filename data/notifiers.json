@@ -1,0 +1,48 @@
+[
+  {
+    "id": "mcg7p7o29df74yx6a6",
+    "name": "测试1",
+    "description": "真实的smtp",
+    "type": "email",
+    "emails": [
+      "voxer@126.com"
+    ],
+    "smtpHost": "smtp.exmail.qq.com",
+    "smtpPort": 465,
+    "smtpUser": "Registered@dxiot.com",
+    "smtpPassword": "XCKqRD9fssHwgi9Z",
+    "enabled": true,
+    "createdAt": "2025-06-28T12:23:10.610Z",
+    "updatedAt": "2025-06-28T12:23:50.469Z"
+  },
+  {
+    "id": "mcg90cb61h0ijchvrlp",
+    "name": "12",
+    "description": "",
+    "type": "email",
+    "emails": [
+      "12@12.com"
+    ],
+    "smtpHost": "12",
+    "smtpPort": 587,
+    "smtpUser": "12",
+    "smtpPassword": "12",
+    "enabled": true,
+    "createdAt": "2025-06-28T12:59:49.458Z"
+  },
+  {
+    "id": "mcg94yphi39c0wunxr",
+    "name": "12123",
+    "description": "",
+    "type": "email",
+    "emails": [
+      "21@gsd.com"
+    ],
+    "smtpHost": "21@gsd.com",
+    "smtpPort": 587,
+    "smtpUser": "21@gsd.com",
+    "smtpPassword": "21@gsd.com",
+    "enabled": true,
+    "createdAt": "2025-06-28T13:03:25.109Z"
+  }
+]

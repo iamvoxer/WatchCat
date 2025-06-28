@@ -39,7 +39,7 @@ class WatchTemplateManager {
 
             const response = await fetch('/api/watch/templates', {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('watchcat_token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
 
