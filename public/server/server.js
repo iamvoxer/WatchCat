@@ -1,221 +1,102 @@
 // Server Management Module
 let servers = {};
 
+// Simple notification system
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 4px;
+        color: white;
+        font-weight: 500;
+        z-index: 10000;
+        transition: all 0.3s ease;
+        transform: translateX(100%);
+        opacity: 0;
+    `;
+
+    // Set background color based on type
+    switch (type) {
+        case 'success':
+            notification.style.backgroundColor = '#28a745';
+            break;
+        case 'error':
+            notification.style.backgroundColor = '#dc3545';
+            break;
+        case 'warning':
+            notification.style.backgroundColor = '#ffc107';
+            notification.style.color = '#212529';
+            break;
+        default:
+            notification.style.backgroundColor = '#17a2b8';
+    }
+
+    // Add to document
+    document.body.appendChild(notification);
+
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+        notification.style.opacity = '1';
+    }, 100);
+
+    // Animate out and remove
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
 // Initialize server management when DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {
     const addServerBtn = document.getElementById('addServerBtn');
     if (addServerBtn) {
-        addServerBtn.addEventListener('click', showAddServerDialog);
+        addServerBtn.addEventListener('click', showServerSidebar);
     }
+
+    // Initialize sidebar event listeners
+    initializeServerSidebar();
 });
 
-// Load servers from API
+// Load servers from backend
 async function loadServers() {
     const container = document.getElementById('serverContainer');
     container.innerHTML = '<div class="loading-message">Loading servers...</div>';
 
-    // 模拟延迟加载效果
-    setTimeout(() => {
-        // 创建假数据
-        const mockServers = {
-            "server-001": {
-                name: "生产服务器-Web01",
-                desc: "主要的Web应用服务器，运行Nginx和Node.js应用",
-                ip: "192.168.1.100",
-                username: "root",
-                password: "******",
-                createdAt: "2024-01-15T08:00:00.000Z",
-                updatedAt: "2024-06-20T14:30:00.000Z",
-                watchlist: [
-                    {
-                        id: "watch-001",
-                        name: "CPU使用率监控",
-                        enable: true,
-                        period: "0 */2 * * *",
-                        watch: {
-                            template: "cpu_monitor",
-                            data: {
-                                threshold: 80,
-                                interval: 60
-                            },
-                            alarmlist: [
-                                {
-                                    id: "alarm-001",
-                                    name: "CPU高负载告警",
-                                    template: "cpu_threshold",
-                                    data: {
-                                        maxCpu: 85,
-                                        duration: 300
-                                    },
-                                    createdAt: "2024-01-15T08:30:00.000Z"
-                                },
-                                {
-                                    id: "alarm-002",
-                                    name: "CPU极高负载告警",
-                                    template: "cpu_critical",
-                                    data: {
-                                        maxCpu: 95,
-                                        duration: 60
-                                    },
-                                    createdAt: "2024-01-15T08:35:00.000Z"
-                                }
-                            ]
-                        },
-                        createdAt: "2024-01-15T08:15:00.000Z",
-                        updatedAt: "2024-06-20T10:00:00.000Z"
-                    },
-                    {
-                        id: "watch-002",
-                        name: "内存使用监控",
-                        enable: true,
-                        period: "0 */5 * * *",
-                        watch: {
-                            template: "memory_monitor",
-                            data: {
-                                threshold: 90,
-                                interval: 300
-                            },
-                            alarmlist: [
-                                {
-                                    id: "alarm-003",
-                                    name: "内存不足告警",
-                                    template: "memory_threshold",
-                                    data: {
-                                        maxMemory: 90,
-                                        duration: 600
-                                    },
-                                    createdAt: "2024-01-20T09:00:00.000Z"
-                                }
-                            ]
-                        },
-                        createdAt: "2024-01-20T08:45:00.000Z",
-                        updatedAt: "2024-06-15T16:20:00.000Z"
-                    },
-                    {
-                        id: "watch-003",
-                        name: "磁盘空间监控",
-                        enable: false,
-                        period: "0 0 * * *",
-                        watch: {
-                            template: "disk_monitor",
-                            data: {
-                                path: "/",
-                                threshold: 85
-                            },
-                            alarmlist: []
-                        },
-                        createdAt: "2024-02-01T10:00:00.000Z",
-                        updatedAt: "2024-06-10T11:30:00.000Z"
-                    }
-                ]
-            },
-            "server-002": {
-                name: "数据库服务器-DB01",
-                desc: "MySQL主数据库服务器",
-                ip: "192.168.1.101",
-                username: "admin",
-                password: "******",
-                createdAt: "2024-01-16T09:00:00.000Z",
-                updatedAt: "2024-06-25T08:45:00.000Z",
-                watchlist: [
-                    {
-                        id: "watch-004",
-                        name: "MySQL服务监控",
-                        enable: true,
-                        period: "0 */1 * * *",
-                        watch: {
-                            template: "mysql_monitor",
-                            data: {
-                                port: 3306,
-                                database: "production"
-                            },
-                            alarmlist: [
-                                {
-                                    id: "alarm-004",
-                                    name: "MySQL连接失败告警",
-                                    template: "mysql_connection",
-                                    data: {
-                                        timeout: 30,
-                                        retries: 3
-                                    },
-                                    createdAt: "2024-01-16T09:30:00.000Z"
-                                }
-                            ]
-                        },
-                        createdAt: "2024-01-16T09:15:00.000Z",
-                        updatedAt: "2024-06-25T08:45:00.000Z"
-                    },
-                    {
-                        id: "watch-005",
-                        name: "数据库性能监控",
-                        enable: true,
-                        period: "0 */10 * * *",
-                        watch: {
-                            template: "mysql_performance",
-                            data: {
-                                slowQueryThreshold: 1000,
-                                connectionThreshold: 100
-                            },
-                            alarmlist: [
-                                {
-                                    id: "alarm-005",
-                                    name: "慢查询告警",
-                                    template: "slow_query",
-                                    data: {
-                                        threshold: 1000,
-                                        count: 10
-                                    },
-                                    createdAt: "2024-02-05T14:20:00.000Z"
-                                }
-                            ]
-                        },
-                        createdAt: "2024-02-05T14:00:00.000Z",
-                        updatedAt: "2024-06-20T13:15:00.000Z"
-                    }
-                ]
-            },
-            "server-003": {
-                name: "缓存服务器-Redis01",
-                desc: "Redis缓存集群主节点",
-                ip: "192.168.1.102",
-                username: "ubuntu",
-                password: "******",
-                createdAt: "2024-02-01T10:30:00.000Z",
-                updatedAt: "2024-06-18T15:20:00.000Z",
-                watchlist: [
-                    {
-                        id: "watch-006",
-                        name: "Redis服务监控",
-                        enable: true,
-                        period: "0 */2 * * *",
-                        watch: {
-                            template: "redis_monitor",
-                            data: {
-                                port: 6379,
-                                auth: true
-                            },
-                            alarmlist: []
-                        },
-                        createdAt: "2024-02-01T11:00:00.000Z",
-                        updatedAt: "2024-06-18T15:20:00.000Z"
-                    }
-                ]
-            },
-            "server-004": {
-                name: "测试服务器-Test01",
-                desc: "开发测试环境服务器",
-                ip: "192.168.1.200",
-                username: "developer",
-                password: "******",
-                createdAt: "2024-03-10T14:00:00.000Z",
-                updatedAt: "2024-06-22T09:30:00.000Z",
-                watchlist: []
+    try {
+        const token = localStorage.getItem('watchcat_token');
+        const response = await fetch('/api/servers', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
             }
-        };
+        });
 
-        servers = mockServers;
-        renderServers(mockServers);
-    }, 800); // 模拟800ms的加载时间
+        const data = await response.json();
+
+        if (data.success) {
+            servers = data.servers;
+            renderServers(data.servers);
+        } else {
+            container.innerHTML = `<div class="no-data-message">❌ Error loading servers: ${data.message}</div>`;
+        }
+    } catch (error) {
+        console.error('Error loading servers:', error);
+        container.innerHTML = `<div class="no-data-message">❌ Error loading servers: ${error.message}</div>`;
+    }
 }
 
 // Render servers in the UI
@@ -423,25 +304,149 @@ function toggleWatchDetails(serverId, watchId) {
     }
 }
 
-// Show add server dialog
-function showAddServerDialog() {
-    const name = prompt('Enter server name:');
-    if (!name) return;
+// Initialize server sidebar
+function initializeServerSidebar() {
+    const sidebar = document.getElementById('serverSidebar');
+    const overlay = document.getElementById('serverSidebarOverlay');
+    const closeBtn = document.getElementById('serverSidebarClose');
+    const cancelBtn = document.getElementById('serverFormCancel');
+    const form = document.getElementById('serverForm');
 
-    const ip = prompt('Enter server IP address:');
-    if (!ip) return;
+    if (!sidebar || !overlay || !closeBtn || !cancelBtn || !form) return;
 
-    const desc = prompt('Enter server description (optional):') || '';
-    const username = prompt('Enter username (default: root):') || 'root';
-    const password = prompt('Enter password:') || '';
+    // Close sidebar events
+    closeBtn.addEventListener('click', hideServerSidebar);
+    cancelBtn.addEventListener('click', hideServerSidebar);
+    overlay.addEventListener('click', hideServerSidebar);
 
-    createServer({
-        name: name,
-        desc: desc,
-        ip: ip,
-        username: username,
-        password: password
-    });
+    // Form submit event
+    form.addEventListener('submit', handleServerFormSubmit);
+}
+
+// Show server sidebar for adding
+function showServerSidebar() {
+    const sidebar = document.getElementById('serverSidebar');
+    const overlay = document.getElementById('serverSidebarOverlay');
+    const title = document.getElementById('serverSidebarTitle');
+    const submitText = document.getElementById('serverFormSubmitText');
+    const form = document.getElementById('serverForm');
+
+    if (!sidebar || !overlay || !title || !submitText || !form) return;
+
+    // Reset form and set add mode
+    form.reset();
+    form.removeAttribute('data-server-id');
+    document.getElementById('serverUsername').value = 'root'; // Set default username
+
+    title.textContent = 'Add Server';
+    submitText.textContent = 'Add Server';
+
+    // Show sidebar
+    sidebar.classList.add('active');
+    overlay.classList.add('active');
+
+    // Focus first input
+    setTimeout(() => {
+        document.getElementById('serverName').focus();
+    }, 300);
+}
+
+// Show server sidebar for editing
+function showEditServerSidebar(serverId) {
+    const server = servers[serverId];
+    if (!server) return;
+
+    const sidebar = document.getElementById('serverSidebar');
+    const overlay = document.getElementById('serverSidebarOverlay');
+    const title = document.getElementById('serverSidebarTitle');
+    const submitText = document.getElementById('serverFormSubmitText');
+    const form = document.getElementById('serverForm');
+
+    if (!sidebar || !overlay || !title || !submitText || !form) return;
+
+    // Fill form with server data
+    document.getElementById('serverName').value = server.name || '';
+    document.getElementById('serverIP').value = server.ip || '';
+    document.getElementById('serverDesc').value = server.desc || '';
+    document.getElementById('serverUsername').value = server.username || 'root';
+    document.getElementById('serverPassword').value = ''; // Don't show password
+    document.getElementById('serverPassword').placeholder = 'Leave empty to keep current password';
+
+    // Set edit mode
+    form.setAttribute('data-server-id', serverId);
+    title.textContent = 'Edit Server';
+    submitText.textContent = 'Update Server';
+
+    // Show sidebar
+    sidebar.classList.add('active');
+    overlay.classList.add('active');
+
+    // Focus first input
+    setTimeout(() => {
+        document.getElementById('serverName').focus();
+    }, 300);
+}
+
+// Hide server sidebar
+function hideServerSidebar() {
+    const sidebar = document.getElementById('serverSidebar');
+    const overlay = document.getElementById('serverSidebarOverlay');
+
+    if (sidebar && overlay) {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+    }
+}
+
+// Handle server form submit
+async function handleServerFormSubmit(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const submitBtn = document.getElementById('serverFormSubmit');
+    const serverId = form.getAttribute('data-server-id');
+    const isEdit = !!serverId;
+
+    // Get form data
+    const formData = new FormData(form);
+    const serverData = {
+        name: formData.get('name').trim(),
+        ip: formData.get('ip').trim(),
+        desc: formData.get('desc').trim(),
+        username: formData.get('username').trim() || 'root',
+        password: formData.get('password').trim()
+    };
+
+    // Validate required fields
+    if (!serverData.name || !serverData.ip) {
+        showWarning('Server name and IP address are required');
+        return;
+    }
+
+    // Disable submit button
+    submitBtn.disabled = true;
+    const originalText = submitBtn.querySelector('#serverFormSubmitText').textContent;
+    submitBtn.querySelector('#serverFormSubmitText').textContent = isEdit ? 'Updating...' : 'Adding...';
+
+    try {
+        if (isEdit) {
+            // Don't send empty password for updates
+            if (!serverData.password) {
+                delete serverData.password;
+            }
+            await updateServer(serverId, serverData);
+        } else {
+            await createServer(serverData);
+        }
+
+        hideServerSidebar();
+    } catch (error) {
+        console.error('Error saving server:', error);
+    } finally {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.querySelector('#serverFormSubmitText').textContent = originalText;
+    }
 }
 
 // Create new server
@@ -460,48 +465,24 @@ async function createServer(serverData) {
         const data = await response.json();
 
         if (data.success) {
-            alert('Server created successfully');
+            showNotification('Server created successfully', 'success');
             loadServers(); // Reload server list
         } else {
-            alert(`Error creating server: ${data.message}`);
+            showNotification(`Error creating server: ${data.message}`, 'error');
+            throw new Error(data.message);
         }
     } catch (error) {
         console.error('Error creating server:', error);
-        alert('Error creating server');
+        if (!error.message.includes('Error creating server:')) {
+            showNotification('Error creating server', 'error');
+        }
+        throw error;
     }
 }
 
 // Edit server
 function editServer(serverId) {
-    const server = servers[serverId];
-    if (!server) return;
-
-    const name = prompt('Enter server name:', server.name);
-    if (name === null) return;
-
-    const ip = prompt('Enter server IP address:', server.ip);
-    if (ip === null) return;
-
-    const desc = prompt('Enter server description:', server.desc || '');
-    if (desc === null) return;
-
-    const username = prompt('Enter username:', server.username);
-    if (username === null) return;
-
-    const password = prompt('Enter new password (leave empty to keep current):');
-
-    const updateData = {
-        name: name,
-        desc: desc,
-        ip: ip,
-        username: username
-    };
-
-    if (password && password.trim() !== '') {
-        updateData.password = password;
-    }
-
-    updateServer(serverId, updateData);
+    showEditServerSidebar(serverId);
 }
 
 // Update server
@@ -520,20 +501,25 @@ async function updateServer(serverId, serverData) {
         const data = await response.json();
 
         if (data.success) {
-            alert('Server updated successfully');
+            showNotification('Server updated successfully', 'success');
             loadServers(); // Reload server list
         } else {
-            alert(`Error updating server: ${data.message}`);
+            showNotification(`Error updating server: ${data.message}`, 'error');
+            throw new Error(data.message);
         }
     } catch (error) {
         console.error('Error updating server:', error);
-        alert('Error updating server');
+        if (!error.message.includes('Error updating server:')) {
+            showNotification('Error updating server', 'error');
+        }
+        throw error;
     }
 }
 
 // Delete server
 async function deleteServer(serverId) {
-    if (!confirm('Are you sure you want to delete this server? This will also delete all watch tasks and alarms.')) {
+    const confirmed = await showConfirm('Are you sure you want to delete this server? This will also delete all watch tasks and alarms.', 'Delete Server');
+    if (!confirmed) {
         return;
     }
 
@@ -549,19 +535,19 @@ async function deleteServer(serverId) {
         const data = await response.json();
 
         if (data.success) {
-            alert('Server deleted successfully');
+            showSuccess('Server deleted successfully');
             loadServers(); // Reload server list
         } else {
-            alert(`Error deleting server: ${data.message}`);
+            showError(`Error deleting server: ${data.message}`);
         }
     } catch (error) {
         console.error('Error deleting server:', error);
-        alert('Error deleting server');
+        showError('Error deleting server');
     }
 }
 
 // Add watch task
-function addWatchTask(serverId) {
+async function addWatchTask(serverId) {
     const name = prompt('Enter watch task name:');
     if (!name) return;
 
@@ -569,7 +555,7 @@ function addWatchTask(serverId) {
     if (!period) return;
 
     const template = prompt('Enter template name:') || '';
-    const enable = confirm('Enable this watch task?');
+    const enable = await showConfirm('Enable this watch task?', 'Enable Watch Task');
 
     const watchData = {
         name: name,
@@ -598,19 +584,19 @@ async function createWatchTask(serverId, watchData) {
         const data = await response.json();
 
         if (data.success) {
-            alert('Watch task created successfully');
+            showSuccess('Watch task created successfully');
             loadServers(); // Reload server list
         } else {
-            alert(`Error creating watch task: ${data.message}`);
+            showError(`Error creating watch task: ${data.message}`);
         }
     } catch (error) {
         console.error('Error creating watch task:', error);
-        alert('Error creating watch task');
+        showError('Error creating watch task');
     }
 }
 
 // Edit watch task
-function editWatchTask(serverId, watchId) {
+async function editWatchTask(serverId, watchId) {
     const server = servers[serverId];
     if (!server) return;
 
@@ -626,7 +612,7 @@ function editWatchTask(serverId, watchId) {
     const template = prompt('Enter template name:', watch.watch.template || '');
     if (template === null) return;
 
-    const enable = confirm('Enable this watch task?');
+    const enable = await showConfirm('Enable this watch task?', 'Enable Watch Task');
 
     const updateData = {
         name: name,
@@ -655,20 +641,21 @@ async function updateWatchTask(serverId, watchId, watchData) {
         const data = await response.json();
 
         if (data.success) {
-            alert('Watch task updated successfully');
+            showSuccess('Watch task updated successfully');
             loadServers(); // Reload server list
         } else {
-            alert(`Error updating watch task: ${data.message}`);
+            showError(`Error updating watch task: ${data.message}`);
         }
     } catch (error) {
         console.error('Error updating watch task:', error);
-        alert('Error updating watch task');
+        showError('Error updating watch task');
     }
 }
 
 // Delete watch task
 async function deleteWatchTask(serverId, watchId) {
-    if (!confirm('Are you sure you want to delete this watch task? This will also delete all associated alarms.')) {
+    const confirmed = await showConfirm('Are you sure you want to delete this watch task? This will also delete all associated alarms.', 'Delete Watch Task');
+    if (!confirmed) {
         return;
     }
 
@@ -684,14 +671,14 @@ async function deleteWatchTask(serverId, watchId) {
         const data = await response.json();
 
         if (data.success) {
-            alert('Watch task deleted successfully');
+            showSuccess('Watch task deleted successfully');
             loadServers(); // Reload server list
         } else {
-            alert(`Error deleting watch task: ${data.message}`);
+            showError(`Error deleting watch task: ${data.message}`);
         }
     } catch (error) {
         console.error('Error deleting watch task:', error);
-        alert('Error deleting watch task');
+        showError('Error deleting watch task');
     }
 }
 
@@ -716,7 +703,7 @@ function addAlarm(serverId, watchId) {
 
         createAlarm(serverId, watchId, alarmData);
     } catch (error) {
-        alert('Invalid JSON data format');
+        showError('Invalid JSON data format');
     }
 }
 
@@ -736,20 +723,21 @@ async function createAlarm(serverId, watchId, alarmData) {
         const data = await response.json();
 
         if (data.success) {
-            alert('Alarm created successfully');
+            showSuccess('Alarm created successfully');
             loadServers(); // Reload server list
         } else {
-            alert(`Error creating alarm: ${data.message}`);
+            showError(`Error creating alarm: ${data.message}`);
         }
     } catch (error) {
         console.error('Error creating alarm:', error);
-        alert('Error creating alarm');
+        showError('Error creating alarm');
     }
 }
 
 // Delete alarm
 async function deleteAlarm(serverId, watchId, alarmId) {
-    if (!confirm('Are you sure you want to delete this alarm?')) {
+    const confirmed = await showConfirm('Are you sure you want to delete this alarm?', 'Delete Alarm');
+    if (!confirmed) {
         return;
     }
 
@@ -765,13 +753,13 @@ async function deleteAlarm(serverId, watchId, alarmId) {
         const data = await response.json();
 
         if (data.success) {
-            alert('Alarm deleted successfully');
+            showSuccess('Alarm deleted successfully');
             loadServers(); // Reload server list
         } else {
-            alert(`Error deleting alarm: ${data.message}`);
+            showError(`Error deleting alarm: ${data.message}`);
         }
     } catch (error) {
         console.error('Error deleting alarm:', error);
-        alert('Error deleting alarm');
+        showError('Error deleting alarm');
     }
 } 

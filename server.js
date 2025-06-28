@@ -106,7 +106,6 @@ function createServer(serverData) {
         };
         
         servers[serverId] = newServer;
-        
         const saved = writeJsonFile('./data/servers.json', servers);
         if (!saved) {
             return {

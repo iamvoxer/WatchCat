@@ -31,7 +31,6 @@ function checkAuthentication() {
 
     try {
         currentUser = JSON.parse(user);
-        document.getElementById('userInfo').textContent = `Welcome, ${currentUser.username}`;
         document.getElementById('headerUserName').textContent = currentUser.username;
     } catch (error) {
         console.error('Error parsing user data:', error);
@@ -305,8 +304,8 @@ function checkServer(serverId) {
     });
 }
 
-function removeServer(serverId) {
-    if (confirm('Are you sure you want to remove this server?')) {
+async function removeServer(serverId) {
+    if (await showConfirm('Are you sure you want to remove this server?', 'Remove Server')) {
         sendToNode({
             type: 'removeServer',
             serverId: serverId
@@ -322,8 +321,8 @@ function checkApplication(applicationId) {
     });
 }
 
-function removeApplication(applicationId) {
-    if (confirm('Are you sure you want to remove this application?')) {
+async function removeApplication(applicationId) {
+    if (await showConfirm('Are you sure you want to remove this application?', 'Remove Application')) {
         sendToNode({
             type: 'removeApplication',
             applicationId: applicationId
@@ -339,8 +338,8 @@ function toggleAlert(alertId) {
     });
 }
 
-function removeAlert(alertId) {
-    if (confirm('Are you sure you want to remove this alert rule?')) {
+async function removeAlert(alertId) {
+    if (await showConfirm('Are you sure you want to remove this alert rule?', 'Remove Alert Rule')) {
         sendToNode({
             type: 'removeAlert',
             alertId: alertId
@@ -389,13 +388,13 @@ function showChangePasswordDialog() {
     if (!newPassword) return;
 
     if (newPassword.length < 6) {
-        alert('New password must be at least 6 characters long');
+        showWarning('New password must be at least 6 characters long');
         return;
     }
 
     const confirmPassword = prompt('Please confirm your new password:');
     if (newPassword !== confirmPassword) {
-        alert('New passwords do not match');
+        showWarning('New passwords do not match');
         return;
     }
 
@@ -420,12 +419,12 @@ async function changePassword(currentPassword, newPassword) {
         const result = await response.json();
 
         if (result.success) {
-            alert('Password changed successfully!');
+            showSuccess('Password changed successfully!');
         } else {
-            alert(result.message || 'Failed to change password');
+            showError(result.message || 'Failed to change password');
         }
     } catch (error) {
         console.error('Change password error:', error);
-        alert('Network error. Please try again.');
+        showError('Network error. Please try again.');
     }
 } 

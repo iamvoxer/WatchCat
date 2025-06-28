@@ -15,7 +15,6 @@
       <div class="sidebar-header">
         <img src="logo.png" alt="WatchCat Logo" class="sidebar-logo" />
         <h1>WatchCat</h1>
-        <div class="user-info" id="userInfo">Loading...</div>
       </div>
 
       <nav>
@@ -26,9 +25,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link" data-section="servers">
-              🖥️ Server
-            </a>
+            <a href="#" class="nav-link" data-section="servers"> 🖥️ Server </a>
           </li>
           <li class="nav-item">
             <a href="#" class="nav-link" data-section="applications">
@@ -41,9 +38,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link" data-section="alerts">
-              🚨 Alert
-            </a>
+            <a href="#" class="nav-link" data-section="alerts"> 🚨 Alert </a>
           </li>
         </ul>
       </nav>
@@ -117,6 +112,90 @@
 
         <div class="server-list" id="serverContainer">
           <div class="loading-message">Loading servers...</div>
+        </div>
+
+        <!-- Server Form Sidebar -->
+        <div class="server-sidebar-overlay" id="serverSidebarOverlay"></div>
+        <div class="server-sidebar" id="serverSidebar">
+          <div class="server-sidebar-header">
+            <h3 id="serverSidebarTitle">Add Server</h3>
+            <button class="server-sidebar-close" id="serverSidebarClose">
+              &times;
+            </button>
+          </div>
+          <div class="server-sidebar-content">
+            <form id="serverForm">
+              <div class="form-group">
+                <label for="serverName">Server Name *</label>
+                <input
+                  type="text"
+                  id="serverName"
+                  name="name"
+                  required
+                  placeholder="Enter server name"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="serverIP">IP Address *</label>
+                <input
+                  type="text"
+                  id="serverIP"
+                  name="ip"
+                  required
+                  placeholder="192.168.1.100"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="serverDesc">Description</label>
+                <textarea
+                  id="serverDesc"
+                  name="desc"
+                  rows="3"
+                  placeholder="Optional description"
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="serverUsername">Username</label>
+                <input
+                  type="text"
+                  id="serverUsername"
+                  name="username"
+                  placeholder="root"
+                  value="root"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="serverPassword">Password</label>
+                <input
+                  type="password"
+                  id="serverPassword"
+                  name="password"
+                  placeholder="Enter password"
+                />
+              </div>
+
+              <div class="form-actions">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  id="serverFormCancel"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  id="serverFormSubmit"
+                >
+                  <span id="serverFormSubmitText">Add Server</span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </section>
 
@@ -208,6 +287,173 @@
       Disconnected
     </div>
 
+    <!-- Confirmation Modal -->
+    <div class="confirm-overlay" id="confirmOverlay">
+      <div class="confirm-modal">
+        <div class="confirm-header">
+          <h3 id="confirmTitle">Confirm Action</h3>
+        </div>
+        <div class="confirm-content">
+          <p id="confirmMessage">
+            Are you sure you want to perform this action?
+          </p>
+        </div>
+        <div class="confirm-actions">
+          <button class="btn btn-secondary" id="confirmCancel">Cancel</button>
+          <button class="btn btn-danger" id="confirmOk">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+      // Global confirmation dialog
+      let confirmResolve = null;
+
+      window.showConfirm = function (message, title = "Confirm Action") {
+        return new Promise((resolve) => {
+          confirmResolve = resolve;
+
+          document.getElementById("confirmTitle").textContent = title;
+          document.getElementById("confirmMessage").textContent = message;
+          document.getElementById("confirmOverlay").classList.add("show");
+        });
+      };
+
+      // Global toast notification system
+      let toastCounter = 0;
+
+      window.showToast = function (
+        message,
+        type = "info",
+        title = null,
+        duration = 5000
+      ) {
+        const toastContainer = document.getElementById("toastContainer");
+        const toastId = "toast-" + ++toastCounter;
+
+        // Default titles and icons for different types
+        const typeConfig = {
+          success: { title: title || "Success", icon: "✓" },
+          error: { title: title || "Error", icon: "✕" },
+          warning: { title: title || "Warning", icon: "⚠" },
+          info: { title: title || "Info", icon: "i" },
+        };
+
+        const config = typeConfig[type] || typeConfig.info;
+
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.id = toastId;
+        toast.innerHTML = `
+          <div class="toast-header">
+            <div class="toast-icon">${config.icon}</div>
+            <h4 class="toast-title">${config.title}</h4>
+            <button class="toast-close" onclick="hideToast('${toastId}')">&times;</button>
+          </div>
+          <div class="toast-body">${message}</div>
+          ${duration > 0 ? '<div class="toast-progress"></div>' : ""}
+        `;
+
+        toastContainer.appendChild(toast);
+
+        // Trigger animation
+        setTimeout(() => {
+          toast.classList.add("show");
+        }, 10);
+
+        // Auto dismiss
+        if (duration > 0) {
+          setTimeout(() => {
+            hideToast(toastId);
+          }, duration);
+        }
+
+        return toastId;
+      };
+
+      window.hideToast = function (toastId) {
+        const toast = document.getElementById(toastId);
+        if (toast) {
+          toast.classList.add("removing");
+          setTimeout(() => {
+            if (toast.parentNode) {
+              toast.parentNode.removeChild(toast);
+            }
+          }, 300);
+        }
+      };
+
+      // Convenience methods
+      window.showSuccess = function (message, title, duration) {
+        return showToast(message, "success", title, duration);
+      };
+
+      window.showError = function (message, title, duration) {
+        return showToast(message, "error", title, duration);
+      };
+
+      window.showWarning = function (message, title, duration) {
+        return showToast(message, "warning", title, duration);
+      };
+
+      window.showInfo = function (message, title, duration) {
+        return showToast(message, "info", title, duration);
+      };
+
+      function hideConfirm() {
+        document.getElementById("confirmOverlay").classList.remove("show");
+      }
+
+      // Event listeners for confirmation dialog
+      document.addEventListener("DOMContentLoaded", function () {
+        const confirmOverlay = document.getElementById("confirmOverlay");
+        const confirmCancel = document.getElementById("confirmCancel");
+        const confirmOk = document.getElementById("confirmOk");
+
+        // Cancel button
+        confirmCancel.addEventListener("click", function () {
+          hideConfirm();
+          if (confirmResolve) {
+            confirmResolve(false);
+            confirmResolve = null;
+          }
+        });
+
+        // Confirm button
+        confirmOk.addEventListener("click", function () {
+          hideConfirm();
+          if (confirmResolve) {
+            confirmResolve(true);
+            confirmResolve = null;
+          }
+        });
+
+        // Click outside to cancel
+        confirmOverlay.addEventListener("click", function (e) {
+          if (e.target === confirmOverlay) {
+            hideConfirm();
+            if (confirmResolve) {
+              confirmResolve(false);
+              confirmResolve = null;
+            }
+          }
+        });
+
+        // ESC key to cancel
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && confirmOverlay.classList.contains("show")) {
+            hideConfirm();
+            if (confirmResolve) {
+              confirmResolve(false);
+              confirmResolve = null;
+            }
+          }
+        });
+      });
+    </script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="index.js"></script>
     <script src="server/server.js"></script>
