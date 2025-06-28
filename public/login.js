@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const loginForm = document.getElementById('loginForm');
     const loginBtn = document.getElementById('loginBtn');
     const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
     const loading = document.getElementById('loading');
 
     // Check if user is already logged in
@@ -84,23 +85,25 @@ document.addEventListener('DOMContentLoaded', function () {
     function setLoading(isLoading) {
         if (isLoading) {
             loginBtn.disabled = true;
-            loginBtn.textContent = 'Logging in...';
-            loading.style.display = 'block';
+            loginBtn.loading = true;
+            loading.classList.remove('hidden');
         } else {
             loginBtn.disabled = false;
-            loginBtn.textContent = 'Login';
-            loading.style.display = 'none';
+            loginBtn.loading = false;
+            loading.classList.add('hidden');
         }
     }
 
     function showError(message) {
-        errorMessage.textContent = message;
-        errorMessage.style.display = 'block';
+        errorText.textContent = message;
+        errorMessage.classList.remove('hidden');
+        errorMessage.open = true;
     }
 
     function clearError() {
-        errorMessage.textContent = '';
-        errorMessage.style.display = 'none';
+        errorText.textContent = '';
+        errorMessage.classList.add('hidden');
+        errorMessage.open = false;
     }
 
     // Handle Enter key press
@@ -108,5 +111,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.key === 'Enter') {
             loginForm.dispatchEvent(new Event('submit'));
         }
+    });
+
+    // Handle error alert close
+    errorMessage.addEventListener('sl-hide', function () {
+        clearError();
     });
 }); 

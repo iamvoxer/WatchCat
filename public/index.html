@@ -6,6 +6,13 @@
     <title>WatchCat - Dashboard</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+
+    <!-- Shoelace CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/themes/light.css"
+    />
+
     <link rel="stylesheet" href="index.css" />
     <link rel="stylesheet" href="server/server.css" />
     <link rel="stylesheet" href="watch/watch.css" />
@@ -127,72 +134,66 @@
             <form id="serverForm">
               <div class="form-group">
                 <label for="serverName">Server Name *</label>
-                <input
-                  type="text"
+                <sl-input
                   id="serverName"
                   name="name"
                   required
                   placeholder="Enter server name"
-                />
+                ></sl-input>
               </div>
 
               <div class="form-group">
                 <label for="serverIP">IP Address *</label>
-                <input
-                  type="text"
+                <sl-input
                   id="serverIP"
                   name="ip"
                   required
                   placeholder="192.168.1.100"
-                />
+                ></sl-input>
               </div>
 
               <div class="form-group">
                 <label for="serverDesc">Description</label>
-                <textarea
+                <sl-textarea
                   id="serverDesc"
                   name="desc"
                   rows="3"
                   placeholder="Optional description"
-                ></textarea>
+                ></sl-textarea>
               </div>
 
               <div class="form-group">
                 <label for="serverUsername">Username</label>
-                <input
-                  type="text"
+                <sl-input
                   id="serverUsername"
                   name="username"
                   placeholder="root"
                   value="root"
-                />
+                ></sl-input>
               </div>
 
               <div class="form-group">
                 <label for="serverPassword">Password</label>
-                <input
+                <sl-input
                   type="password"
                   id="serverPassword"
                   name="password"
                   placeholder="Enter password"
-                />
+                  password-toggle
+                ></sl-input>
               </div>
 
               <div class="form-actions">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  id="serverFormCancel"
-                >
+                <sl-button variant="default" id="serverFormCancel">
                   Cancel
-                </button>
-                <button
+                </sl-button>
+                <sl-button
+                  variant="primary"
                   type="submit"
-                  class="btn btn-primary"
                   id="serverFormSubmit"
                 >
                   <span id="serverFormSubmitText">Add Server</span>
-                </button>
+                </sl-button>
               </div>
             </form>
           </div>
@@ -287,104 +288,129 @@
       Disconnected
     </div>
 
-    <!-- Confirmation Modal -->
-    <div class="confirm-overlay" id="confirmOverlay">
-      <div class="confirm-modal">
-        <div class="confirm-header">
-          <h3 id="confirmTitle">Confirm Action</h3>
-        </div>
-        <div class="confirm-content">
-          <p id="confirmMessage">
-            Are you sure you want to perform this action?
-          </p>
-        </div>
-        <div class="confirm-actions">
-          <button class="btn btn-secondary" id="confirmCancel">Cancel</button>
-          <button class="btn btn-danger" id="confirmOk">Confirm</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
+    <!-- Global Confirm Dialog -->
+    <sl-dialog label="Confirm Action" id="globalConfirmDialog">
+      <p id="confirmMessage">Are you sure?</p>
+      <sl-button slot="footer" variant="default" id="confirmCancel"
+        >Cancel</sl-button
+      >
+      <sl-button slot="footer" variant="primary" id="confirmOk"
+        >Confirm</sl-button
+      >
+    </sl-dialog>
 
     <script>
-      // Global confirmation dialog
-      let confirmResolve = null;
-
-      window.showConfirm = function (message, title = "Confirm Action") {
-        return new Promise((resolve) => {
-          confirmResolve = resolve;
-
-          document.getElementById("confirmTitle").textContent = title;
-          document.getElementById("confirmMessage").textContent = message;
-          document.getElementById("confirmOverlay").classList.add("show");
-        });
-      };
-
-      // Global toast notification system
-      let toastCounter = 0;
-
-      window.showToast = function (
+      // Simple Shoelace-based toast system
+      window.showToast = async function (
         message,
         type = "info",
         title = null,
         duration = 5000
       ) {
-        const toastContainer = document.getElementById("toastContainer");
-        const toastId = "toast-" + ++toastCounter;
+        // Ensure sl-alert is registered before creating
+        await customElements.whenDefined('sl-alert');
+        // Map error to danger for Shoelace variant
+        const variant =
+          type === "error" ? "danger" : type === "info" ? "primary" : type;
 
-        // Default titles and icons for different types
-        const typeConfig = {
-          success: { title: title || "Success", icon: "✓" },
-          error: { title: title || "Error", icon: "✕" },
-          warning: { title: title || "Warning", icon: "⚠" },
-          info: { title: title || "Info", icon: "i" },
+        // Icon mapping
+        const icons = {
+          success: "check-circle",
+          danger: "exclamation-triangle",
+          warning: "exclamation-triangle",
+          primary: "info-circle",
         };
 
-        const config = typeConfig[type] || typeConfig.info;
+        // Create alert element (like in official examples)
+        const alert = document.createElement("sl-alert");
+        alert.variant = variant;
+        alert.closable = true;
+        alert.duration = duration;
 
-        const toast = document.createElement("div");
-        toast.className = `toast ${type}`;
-        toast.id = toastId;
-        toast.innerHTML = `
-          <div class="toast-header">
-            <div class="toast-icon">${config.icon}</div>
-            <h4 class="toast-title">${config.title}</h4>
-            <button class="toast-close" onclick="hideToast('${toastId}')">&times;</button>
-          </div>
-          <div class="toast-body">${message}</div>
-          ${duration > 0 ? '<div class="toast-progress"></div>' : ""}
+        alert.innerHTML = `
+          <sl-icon slot="icon" name="${icons[variant]}"></sl-icon>
+          ${title ? `<strong>${title}</strong><br>` : ""}${message}
         `;
 
-        toastContainer.appendChild(toast);
-
-        // Trigger animation
+        // Add to DOM first
+        document.body.appendChild(alert);
         setTimeout(() => {
-          toast.classList.add("show");
-        }, 10);
+          alert.toast();
+        }, 200);
 
-        // Auto dismiss
-        if (duration > 0) {
-          setTimeout(() => {
-            hideToast(toastId);
-          }, duration);
-        }
-
-        return toastId;
+        return alert;
       };
 
-      window.hideToast = function (toastId) {
-        const toast = document.getElementById(toastId);
-        if (toast) {
-          toast.classList.add("removing");
+      // Simple Shoelace-based confirmation dialog
+      let confirmResolve = null;
+
+      window.showConfirm = function (message, title = "Confirm Action") {
+        return new Promise((resolve) => {
+          const dialog = document.getElementById("globalConfirmDialog");
+          const messageEl = document.getElementById("confirmMessage");
+
+          // Set content
+          dialog.label = title;
+          messageEl.textContent = message;
+
+          // Store resolve function
+          confirmResolve = resolve;
+
+          // Show dialog and ensure proper focus management
+          dialog.show();
+
+          // Ensure dialog is properly focused after showing
           setTimeout(() => {
-            if (toast.parentNode) {
-              toast.parentNode.removeChild(toast);
+            if (dialog.shadowRoot) {
+              const panel = dialog.shadowRoot.querySelector('[role="dialog"]');
+              if (panel) {
+                panel.focus();
+              }
             }
-          }, 300);
-        }
+          }, 100);
+        });
       };
+
+      // Setup confirm dialog event listeners
+      document.addEventListener("DOMContentLoaded", function () {
+        const dialog = document.getElementById("globalConfirmDialog");
+        const cancelBtn = document.getElementById("confirmCancel");
+        const okBtn = document.getElementById("confirmOk");
+
+        // Helper function to close dialog properly
+        const closeDialog = (result) => {
+          // Clear focus from any internal elements before hiding
+          if (dialog.shadowRoot) {
+            const focusedElement = dialog.shadowRoot.activeElement;
+            if (focusedElement) {
+              focusedElement.blur();
+            }
+          }
+
+          dialog.hide();
+
+          if (confirmResolve) {
+            confirmResolve(result);
+            confirmResolve = null;
+          }
+        };
+
+        cancelBtn.addEventListener("click", () => {
+          closeDialog(false);
+        });
+
+        okBtn.addEventListener("click", () => {
+          closeDialog(true);
+        });
+
+        // Handle ESC key or backdrop click
+        dialog.addEventListener("sl-hide", () => {
+          if (confirmResolve) {
+            confirmResolve(false);
+            confirmResolve = null;
+          }
+        });
+      });
 
       // Convenience methods
       window.showSuccess = function (message, title, duration) {
@@ -402,58 +428,13 @@
       window.showInfo = function (message, title, duration) {
         return showToast(message, "info", title, duration);
       };
-
-      function hideConfirm() {
-        document.getElementById("confirmOverlay").classList.remove("show");
-      }
-
-      // Event listeners for confirmation dialog
-      document.addEventListener("DOMContentLoaded", function () {
-        const confirmOverlay = document.getElementById("confirmOverlay");
-        const confirmCancel = document.getElementById("confirmCancel");
-        const confirmOk = document.getElementById("confirmOk");
-
-        // Cancel button
-        confirmCancel.addEventListener("click", function () {
-          hideConfirm();
-          if (confirmResolve) {
-            confirmResolve(false);
-            confirmResolve = null;
-          }
-        });
-
-        // Confirm button
-        confirmOk.addEventListener("click", function () {
-          hideConfirm();
-          if (confirmResolve) {
-            confirmResolve(true);
-            confirmResolve = null;
-          }
-        });
-
-        // Click outside to cancel
-        confirmOverlay.addEventListener("click", function (e) {
-          if (e.target === confirmOverlay) {
-            hideConfirm();
-            if (confirmResolve) {
-              confirmResolve(false);
-              confirmResolve = null;
-            }
-          }
-        });
-
-        // ESC key to cancel
-        document.addEventListener("keydown", function (e) {
-          if (e.key === "Escape" && confirmOverlay.classList.contains("show")) {
-            hideConfirm();
-            if (confirmResolve) {
-              confirmResolve(false);
-              confirmResolve = null;
-            }
-          }
-        });
-      });
     </script>
+
+    <!-- Shoelace JS -->
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/shoelace-autoloader.js"
+    ></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="index.js"></script>
     <script src="server/server.js"></script>

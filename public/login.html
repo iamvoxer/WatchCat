@@ -6,6 +6,13 @@
     <title>WatchCat - Login</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+
+    <!-- Shoelace CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/themes/light.css"
+    />
+
     <style>
       * {
         margin: 0;
@@ -54,80 +61,47 @@
       }
 
       .form-group {
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
       }
 
-      .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: #333;
-        font-weight: 500;
-      }
-
-      .form-group input {
+      /* 调整 Shoelace 组件样式 */
+      sl-input {
         width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 1rem;
-        transition: border-color 0.3s;
       }
 
-      .form-group input:focus {
-        outline: none;
-        border-color: #667eea;
-      }
-
-      .login-btn {
+      sl-button {
         width: 100%;
-        padding: 0.75rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: transform 0.2s;
-      }
-
-      .login-btn:hover {
-        transform: translateY(-2px);
-      }
-
-      .login-btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-      }
-
-      .error-message {
-        color: #e74c3c;
-        text-align: center;
         margin-top: 1rem;
-        font-size: 0.9rem;
+      }
+
+      sl-alert {
+        margin-top: 1rem;
       }
 
       .loading {
-        display: none;
-        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         margin-top: 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
       }
 
-      .loading::after {
-        content: "";
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 2px solid #667eea;
-        border-radius: 50%;
-        border-top-color: transparent;
-        animation: spin 1s ease-in-out infinite;
+      /* 隐藏时的样式 */
+      .hidden {
+        display: none !important;
       }
 
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
+      /* 自定义按钮颜色以匹配原有设计 */
+      sl-button[variant="primary"]::part(base) {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+      }
+
+      sl-button[variant="primary"]:hover::part(base) {
+        background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        transform: translateY(-2px);
+        transition: transform 0.2s;
       }
     </style>
   </head>
@@ -141,22 +115,55 @@
 
       <form id="loginForm">
         <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" id="username" name="username" required />
+          <sl-input
+            id="username"
+            name="username"
+            label="Username"
+            placeholder="Enter your username"
+            required
+          >
+            <sl-icon name="person" slot="prefix"></sl-icon>
+          </sl-input>
         </div>
 
         <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" required />
+          <sl-input
+            id="password"
+            name="password"
+            type="password"
+            label="Password"
+            placeholder="Enter your password"
+            required
+            password-toggle
+          >
+            <sl-icon name="lock" slot="prefix"></sl-icon>
+          </sl-input>
         </div>
 
-        <button type="submit" class="login-btn" id="loginBtn">Login</button>
+        <sl-button type="submit" variant="primary" id="loginBtn">
+          <sl-icon name="box-arrow-in-right" slot="prefix"></sl-icon>
+          Login
+        </sl-button>
 
-        <div class="loading" id="loading"></div>
-        <div class="error-message" id="errorMessage"></div>
+        <!-- Loading state -->
+        <div class="loading hidden" id="loading">
+          <sl-spinner style="font-size: 2rem"></sl-spinner>
+          <span>Logging in...</span>
+        </div>
+
+        <!-- Error message -->
+        <sl-alert variant="danger" id="errorMessage" class="hidden" closable>
+          <sl-icon name="exclamation-triangle" slot="icon"></sl-icon>
+          <span id="errorText"></span>
+        </sl-alert>
       </form>
     </div>
 
+    <!-- Shoelace JS -->
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.1/cdn/shoelace-autoloader.js"
+    ></script>
     <script src="login.js"></script>
   </body>
 </html>

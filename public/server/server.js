@@ -1,65 +1,6 @@
 // Server Management Module
 let servers = {};
 
-// Simple notification system
-function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
-
-    // Add styles
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        border-radius: 4px;
-        color: white;
-        font-weight: 500;
-        z-index: 10000;
-        transition: all 0.3s ease;
-        transform: translateX(100%);
-        opacity: 0;
-    `;
-
-    // Set background color based on type
-    switch (type) {
-        case 'success':
-            notification.style.backgroundColor = '#28a745';
-            break;
-        case 'error':
-            notification.style.backgroundColor = '#dc3545';
-            break;
-        case 'warning':
-            notification.style.backgroundColor = '#ffc107';
-            notification.style.color = '#212529';
-            break;
-        default:
-            notification.style.backgroundColor = '#17a2b8';
-    }
-
-    // Add to document
-    document.body.appendChild(notification);
-
-    // Animate in
-    setTimeout(() => {
-        notification.style.transform = 'translateX(0)';
-        notification.style.opacity = '1';
-    }, 100);
-
-    // Animate out and remove
-    setTimeout(() => {
-        notification.style.transform = 'translateX(100%)';
-        notification.style.opacity = '0';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
-    }, 3000);
-}
-
 // Initialize server management when DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {
     const addServerBtn = document.getElementById('addServerBtn');
@@ -316,6 +257,8 @@ function initializeServerSidebar() {
 
     // Close sidebar events
     closeBtn.addEventListener('click', hideServerSidebar);
+
+    // For Shoelace buttons, use click event
     cancelBtn.addEventListener('click', hideServerSidebar);
     overlay.addEventListener('click', hideServerSidebar);
 
@@ -370,7 +313,7 @@ function showEditServerSidebar(serverId) {
     document.getElementById('serverDesc').value = server.desc || '';
     document.getElementById('serverUsername').value = server.username || 'root';
     document.getElementById('serverPassword').value = ''; // Don't show password
-    document.getElementById('serverPassword').placeholder = 'Leave empty to keep current password';
+    document.getElementById('serverPassword').setAttribute('placeholder', 'Leave empty to keep current password');
 
     // Set edit mode
     form.setAttribute('data-server-id', serverId);
@@ -381,10 +324,13 @@ function showEditServerSidebar(serverId) {
     sidebar.classList.add('active');
     overlay.classList.add('active');
 
-    // Focus first input
+    // Focus first input (wait for Shoelace component to be ready)
     setTimeout(() => {
-        document.getElementById('serverName').focus();
-    }, 300);
+        const serverNameInput = document.getElementById('serverName');
+        if (serverNameInput && serverNameInput.focus) {
+            serverNameInput.focus();
+        }
+    }, 500); // Increased timeout for Shoelace initialization
 }
 
 // Hide server sidebar
@@ -465,16 +411,16 @@ async function createServer(serverData) {
         const data = await response.json();
 
         if (data.success) {
-            showNotification('Server created successfully', 'success');
+            showSuccess('Server created successfully');
             loadServers(); // Reload server list
         } else {
-            showNotification(`Error creating server: ${data.message}`, 'error');
+            showError(`Error creating server: ${data.message}`);
             throw new Error(data.message);
         }
     } catch (error) {
         console.error('Error creating server:', error);
         if (!error.message.includes('Error creating server:')) {
-            showNotification('Error creating server', 'error');
+            showError('Error creating server');
         }
         throw error;
     }
@@ -501,16 +447,16 @@ async function updateServer(serverId, serverData) {
         const data = await response.json();
 
         if (data.success) {
-            showNotification('Server updated successfully', 'success');
+            showSuccess('Server updated successfully');
             loadServers(); // Reload server list
         } else {
-            showNotification(`Error updating server: ${data.message}`, 'error');
+            showError(`Error updating server: ${data.message}`);
             throw new Error(data.message);
         }
     } catch (error) {
         console.error('Error updating server:', error);
         if (!error.message.includes('Error updating server:')) {
-            showNotification('Error updating server', 'error');
+            showError('Error updating server');
         }
         throw error;
     }

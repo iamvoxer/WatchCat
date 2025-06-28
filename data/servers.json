@@ -1,1 +1,32 @@
-{}
+{
+  "b60f5b6c-370f-4bdf-a672-a0f7314c7f04": {
+    "name": "11",
+    "desc": "",
+    "ip": "111111",
+    "username": "root",
+    "password": "1111",
+    "watchlist": [],
+    "createdAt": "2025-06-28T02:54:42.819Z",
+    "updatedAt": "2025-06-28T02:54:54.917Z"
+  },
+  "102bfc15-5121-44b9-a992-f9a8067ca2b1": {
+    "name": "232123",
+    "desc": "",
+    "ip": "123213111",
+    "username": "root",
+    "password": "",
+    "watchlist": [],
+    "createdAt": "2025-06-28T03:11:47.522Z",
+    "updatedAt": "2025-06-28T03:11:56.979Z"
+  },
+  "d0641284-c53b-4d7b-b836-e10bc499b608": {
+    "name": "11111",
+    "desc": "",
+    "ip": "1111",
+    "username": "root",
+    "password": "",
+    "watchlist": [],
+    "createdAt": "2025-06-28T03:14:37.750Z",
+    "updatedAt": "2025-06-28T03:14:37.750Z"
+  }
+}
